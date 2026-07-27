@@ -1,0 +1,16 @@
+.venv/
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.db
+*.sqlite
+*.csv
+*.log
+.env
+.DS_Store
+.vscode/
+.idea/
+
+# Ignore project-specific norm files and outputs
+Mein_Normen_Projekt/
