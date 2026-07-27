@@ -16,19 +16,19 @@ Modulare webbasierte Anwendung zur Segmentierung, Korrektur und Export von Norme
 ### 1.1 OCR & PDF-Engine
 **Beschreibung:** PyMuPDF-basiertes Laden von PDFs, Text-Layer-Erkennung, automatische OCR bei fehlender TextSchicht.
 
-- [ ] Modul `src/normen_tool/pdf_handler.py` erstellen
-  - [ ] Funktion `load_pdf(path)` — PDF mit Pymupdf laden
-  - [ ] Funktion `has_text_layer(doc)` — Prüfung auf unsichtbare OCR
-  - [ ] Funktion `extract_ocr_layer(pdf_path)` — OCR erzeugen via pytesseract/pdfplumber
-  - [ ] Funktion `get_bbox_and_text(page)` — Bounding Boxes + Text pro Block
-- [ ] Unit-Tests `tests/test_pdf_handler.py`
-  - [ ] Test native PDFs (mit Textlayer)
-  - [ ] Test gescannte PDFs (ohne Textlayer)
-  - [ ] Test OCR-Generierung
-- [ ] Abhängigkeiten updaten (optional: pytesseract, pdfplumber)
+- [x] Modul `src/normen_tool/pdf_handler.py` erstellen
+  - [x] Funktion `load_pdf(path)` — PDF mit Pymupdf laden
+  - [x] Funktion `has_text_layer(doc)` — Prüfung auf unsichtbare OCR
+  - [x] Funktion `extract_ocr_layer(pdf_path)` — OCR erzeugen via pytesseract/pdfplumber
+  - [x] Funktion `get_bbox_and_text(page)` — Bounding Boxes + Text pro Block
+- [x] Unit-Tests `tests/test_pdf_handler.py`
+  - [x] Test native PDFs (mit Textlayer)
+  - [x] Test gescannte PDFs (ohne Textlayer)
+  - [x] Test OCR-Generierung
+- [x] Abhängigkeiten updaten (optional: pytesseract, pdfplumber)
 
-**Status:** ⬜ Nicht gestartet  
-**Notizen:** —
+**Status:** ✅ Abgeschlossen  
+**Notizen:** PDFHandler-Klasse mit vollständiger Context-Manager-Unterstützung, 20/20 Unit-Tests bestanden, Code bestanden ruff/mypy.
 
 ---
 
@@ -194,7 +194,7 @@ Modulare webbasierte Anwendung zur Segmentierung, Korrektur und Export von Norme
 
 ---
 
-## ✅ Abgeschlossene Aufgaben (Phase 0)
+## ✅ Abgeschlossene Aufgaben (Phase 0 + 1.1)
 
 - [x] GitHub-Repo erstellt & initialisiert
 - [x] Python-Projekt-Struktur mit `pyproject.toml`, venv
@@ -203,6 +203,7 @@ Modulare webbasierte Anwendung zur Segmentierung, Korrektur und Export von Norme
 - [x] SRS finalisiert mit OCR-, CSV-, UI-Details
 - [x] Initial `src/normen_tool/main.py` + `/health`-Endpoint
 - [x] Tests-Gerüst mit pytest
+- [x] **Phase 1.1: PDFHandler vollständig implementiert** (PDFLoader, Text-Layer-Erkennung, BBox-Extraktion, 20 Unit-Tests)
 
 ---
 
@@ -213,8 +214,8 @@ Modulare webbasierte Anwendung zur Segmentierung, Korrektur und Export von Norme
 | **Phasen gesamt** | 4 |
 | **Phasen abgeschlossen** | 1 |
 | **Tasks gesamt** | ~45 |
-| **Tasks abgeschlossen** | ~5 |
-| **Completion %** | ~11% |
+| **Tasks abgeschlossen** | ~10 |
+| **Completion %** | ~22% |
 
 ---
 
@@ -248,4 +249,4 @@ Modulare webbasierte Anwendung zur Segmentierung, Korrektur und Export von Norme
 
 ---
 
-**Stand:** 28. Juli 2026 | **Nächste Überprüfung:** Nach Phase 1.1
+**Stand:** 28. Juli 2026 | **Nächste Überprüfung:** Nach Phase 1.2 (Regelbasierter Parser)
