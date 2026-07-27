@@ -1,0 +1,58 @@
+Metadata-Version: 2.4
+Name: normen_segmentierung_tool
+Version: 0.1.0
+Summary: Normen-PDFs segmentieren, korrigieren und als CSV exportieren
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+Requires-Dist: fastapi>=0.111.0
+Requires-Dist: uvicorn>=0.24.0
+Requires-Dist: pymupdf>=1.22.0
+Requires-Dist: pandas>=2.2.0
+Requires-Dist: python-dotenv>=1.0.0
+Requires-Dist: rich>=13.0.0
+Provides-Extra: dev
+Requires-Dist: pytest>=8.4.0; extra == "dev"
+Requires-Dist: pytest-cov>=4.2.0; extra == "dev"
+Requires-Dist: ruff>=0.0.300; extra == "dev"
+Requires-Dist: mypy>=1.8.0; extra == "dev"
+Requires-Dist: pre-commit>=3.5.0; extra == "dev"
+Requires-Dist: types-requests>=0.0.0; extra == "dev"
+
+# Normen-Segmentierungs-Tool
+
+Dieses Repository enthält ein Python-Projekt für die segmentierte Verarbeitung von Normen-PDFs.
+
+## Setup
+
+1. Erstelle die virtuelle Umgebung:
+   ```powershell
+   py -3.11 -m venv .venv
+   ```
+2. Aktiviere die Umgebung:
+   ```powershell
+   .\.venv\Scripts\Activate.ps1
+   ```
+3. Installiere die Abhängigkeiten:
+   ```powershell
+   python -m pip install --upgrade pip setuptools wheel
+   python -m pip install -e .[dev]
+   ```
+4. Installiere Git-Hooks:
+   ```bash
+   pre-commit install
+   ```
+
+## Start
+
+Später kann der Server mit `uvicorn` gestartet werden:
+
+```powershell
+uvicorn normen_tool.main:app --reload
+```
+
+## Tests
+
+```powershell
+pytest
+pytest --cov=src --cov-report=term-missing --cov-report=html
+```
