@@ -53,20 +53,22 @@ Modulare webbasierte Anwendung zur Segmentierung, Korrektur und Export von Norme
 ### 1.3 DB-Schema & Modelle
 **Beschreibung:** SQLite-Datenbank-Schema für Blöcke, UUIDs, Bounding-Boxes, Versionierung.
 
-- [ ] Modul `src/normen_tool/db/models.py` — SQLAlchemy/Pydantic Models
-  - [ ] Block-Model: `id` (UUIDv4), `doc_name`, `section`, `content`, `pages`, `bboxes`, `ai_generated`, `modified_at`
-  - [ ] Document-Model: `name`, `path`, `created_at`, `page_count`
-- [ ] Migrations `src/normen_tool/db/migrations.py`
-  - [ ] Initiale `blocks` + `documents`-Tables
-- [ ] DB-Utilities `src/normen_tool/db/client.py`
-  - [ ] Funktion `init_db(project_dir)` — DB-Datei erstellen/laden
-  - [ ] Funktion `insert_block(...)` — Block speichern
-  - [ ] Funktion `list_blocks(doc_name)` — Blöcke pro PDF
-  - [ ] Funktion `update_block(id, content)` — Änderungen speichern
-- [ ] Tests `tests/test_db.py`
+- [x] Modul `src/normen_tool/db/models.py` — SQLAlchemy/Pydantic Models
+  - [x] Block-Model: `id` (UUIDv4), `doc_name`, `section`, `content`, `pages`, `bboxes`, `ai_generated`, `modified_at`
+  - [x] Document-Model: `name`, `path`, `created_at`, `page_count`
+- [x] Migrations `src/normen_tool/db/migrations.py`
+  - [x] Initiale `blocks` + `documents`-Tables
+- [x] DB-Utilities `src/normen_tool/db/client.py`
+  - [x] Funktion `init_db(project_dir)` — DB-Datei erstellen/laden
+  - [x] Funktion `insert_block(...)` — Block speichern
+  - [x] Funktion `list_blocks(doc_name)` — Blöcke pro PDF
+  - [x] Funktion `update_block(id, content)` — Änderungen speichern
+  - [x] Bulk insert, cascading deletes, statistics
+- [x] Tests `tests/test_db.py`
+  - [x] 21/21 Unit-Tests bestanden
 
-**Status:** ⏳ In Planung  
-**Notizen:** Startet nach Phase 1.2 Abschluss
+**Status:** ✅ Abgeschlossen  
+**Notizen:** DBClient mit vollständigem CRUD + Batch-Operationen, detached instance Fehler behoben, alle Tests grün. Windows teardown-Fehler gelöst. Code bestanden ruff/mypy.
 
 ---
 

@@ -1,3 +1,4 @@
+LICENSE
 README.md
 pyproject.toml
 src/normen_segmentierung_tool.egg-info/PKG-INFO
@@ -7,4 +8,12 @@ src/normen_segmentierung_tool.egg-info/requires.txt
 src/normen_segmentierung_tool.egg-info/top_level.txt
 src/normen_tool/__init__.py
 src/normen_tool/main.py
+src/normen_tool/pdf_handler.py
+src/normen_tool/segmentation.py
+src/normen_tool/db/__init__.py
+src/normen_tool/db/client.py
+src/normen_tool/db/models.py
+tests/test_db.py
 tests/test_health.py
+tests/test_pdf_handler.py
+tests/test_segmentation.py
