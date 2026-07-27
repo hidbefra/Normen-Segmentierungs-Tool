@@ -35,18 +35,18 @@ Modulare webbasierte Anwendung zur Segmentierung, Korrektur und Export von Norme
 ### 1.2 Regelbasierter Parser (Segmentation)
 **Beschreibung:** Kapitel- und Absatz-Segmentierung basierend auf Heuristiken (Überschriften, Satzzeichen, Einzüge).
 
-- [ ] Modul `src/normen_tool/segmentation.py` erstellen
-  - [ ] Funktion `parse_blocks(text, bbox_list)` — Text in Absätze teilen
-  - [ ] Heuristik für Kapitelüberschriften (z.B. "4.2.1" oder "Kapitel 4")
-  - [ ] Cross-Page-Merge: Satzfluss über Seiten hinweg erkennen
-  - [ ] Sentence-Boundary-Trimming (nur komplette Sätze)
-- [ ] Tests `tests/test_segmentation.py`
-  - [ ] Test mit Sample-Norm-PDF
-  - [ ] Test Cross-Page-Merge
-  - [ ] Test Satzgrenzen-Filter
+- [x] Modul `src/normen_tool/segmentation.py` erstellen
+  - [x] Funktion `parse_blocks(text, bbox_list)` — Text in Absätze teilen
+  - [x] Heuristik für Kapitelüberschriften (z.B. "4.2.1" oder "Kapitel 4")
+  - [x] Cross-Page-Merge: Satzfluss über Seiten hinweg erkennen
+  - [x] Sentence-Boundary-Trimming (nur komplette Sätze)
+- [x] Tests `tests/test_segmentation.py`
+  - [x] Test mit Sample-Norm-PDF
+  - [x] Test Cross-Page-Merge
+  - [x] Test Satzgrenzen-Filter
 
-**Status:** ⬜ Nicht gestartet  
-**Notizen:** —
+**Status:** ✅ Abgeschlossen  
+**Notizen:** RuleBasedSegmenter mit Block/Segment-Klassen, 26/26 Unit-Tests bestanden, Code bestanden ruff/mypy, Cross-Page-Merge mit Satzfluss-Erkennung.
 
 ---
 
@@ -65,8 +65,8 @@ Modulare webbasierte Anwendung zur Segmentierung, Korrektur und Export von Norme
   - [ ] Funktion `update_block(id, content)` — Änderungen speichern
 - [ ] Tests `tests/test_db.py`
 
-**Status:** ⬜ Nicht gestartet  
-**Notizen:** —
+**Status:** ⏳ In Planung  
+**Notizen:** Startet nach Phase 1.2 Abschluss
 
 ---
 
@@ -194,7 +194,7 @@ Modulare webbasierte Anwendung zur Segmentierung, Korrektur und Export von Norme
 
 ---
 
-## ✅ Abgeschlossene Aufgaben (Phase 0 + 1.1)
+## ✅ Abgeschlossene Aufgaben (Phase 0 + 1.1 + 1.2)
 
 - [x] GitHub-Repo erstellt & initialisiert
 - [x] Python-Projekt-Struktur mit `pyproject.toml`, venv
@@ -204,6 +204,7 @@ Modulare webbasierte Anwendung zur Segmentierung, Korrektur und Export von Norme
 - [x] Initial `src/normen_tool/main.py` + `/health`-Endpoint
 - [x] Tests-Gerüst mit pytest
 - [x] **Phase 1.1: PDFHandler vollständig implementiert** (PDFLoader, Text-Layer-Erkennung, BBox-Extraktion, 20 Unit-Tests)
+- [x] **Phase 1.2: Rule-Based Segmenter implementiert** (Chapter/Section-Erkennung, Cross-Page-Merge, Sentence-Boundary-Trimming, 26 Unit-Tests)
 
 ---
 
@@ -214,8 +215,8 @@ Modulare webbasierte Anwendung zur Segmentierung, Korrektur und Export von Norme
 | **Phasen gesamt** | 4 |
 | **Phasen abgeschlossen** | 1 |
 | **Tasks gesamt** | ~45 |
-| **Tasks abgeschlossen** | ~10 |
-| **Completion %** | ~22% |
+| **Tasks abgeschlossen** | ~15 |
+| **Completion %** | ~33% |
 
 ---
 
@@ -249,4 +250,4 @@ Modulare webbasierte Anwendung zur Segmentierung, Korrektur und Export von Norme
 
 ---
 
-**Stand:** 28. Juli 2026 | **Nächste Überprüfung:** Nach Phase 1.2 (Regelbasierter Parser)
+**Stand:** 28. Juli 2026 | **Nächste Überprüfung:** Nach Phase 1.3 (DB-Schema)
