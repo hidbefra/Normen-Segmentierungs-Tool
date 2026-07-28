@@ -77,69 +77,95 @@ Modulare webbasierte Anwendung zur Segmentierung, Korrektur und Export von Norme
 ### 2.1 Core Endpoints
 **Beschreibung:** FastAPI-Endpoints für Projekt-, PDF- und Block-Verwaltung.
 
-- [ ] **Projekt-Management**
-  - [ ] `POST /project/open` — Ordner öffnen, DB laden/erstellen
-  - [ ] `GET /project/status` — DB-Datei + PDF-Liste
+- [x] **Projekt-Management**
+  - [x] `POST /project/open` — Ordner öffnen, DB laden/erstellen
+  - [x] `GET /project/status` — DB-Datei + PDF-Liste
   
-- [ ] **PDF-Verwaltung**
-  - [ ] `GET /project/pdfs` — Liste aller PDFs im Ordner
-  - [ ] `GET /pdf/{doc_id}/pages` — Seiten + Metadaten
-  - [ ] `GET /pdf/{doc_id}/rendered/{page_num}` — Seiten-Rendering (PNG/SVG)
+- [x] **PDF-Verwaltung**
+  - [x] `GET /project/pdfs` — Liste aller PDFs im Ordner
+  - [x] `GET /pdf/{doc_id}/pages` — Seiten + Metadaten
+  - [x] `GET /pdf/{doc_id}/rendered/{page_num}` — Seiten-Rendering (PNG/SVG)
   
-- [ ] **Block-Verwaltung (CRUD)**
-  - [ ] `GET /blocks/{doc_id}` — Alle Blöcke eines PDFs
-  - [ ] `GET /block/{id}` — Ein Block + Details
-  - [ ] `POST /block` — Neuen Block erstellen (manuell)
-  - [ ] `PATCH /block/{id}` — Block bearbeiten (Content, Section, etc.)
-  - [ ] `DELETE /block/{id}` — Block löschen
+- [x] **Block-Verwaltung (CRUD)**
+  - [x] `GET /blocks/{doc_id}` — Alle Blöcke eines PDFs
+  - [x] `GET /block/{id}` — Ein Block + Details
+  - [x] `POST /block` — Neuen Block erstellen (manuell)
+  - [x] `PATCH /block/{id}` — Block bearbeiten (Content, Section, etc.)
+  - [x] `DELETE /block/{id}` — Block löschen
   
-- [ ] **Re-Segmentation**
-  - [ ] `POST /pdf/{doc_id}/parse` — Regelparser auf PDF anwenden
+- [x] **Re-Segmentation**
+  - [x] `POST /pdf/{doc_id}/parse` — Regelparser auf PDF anwenden
 
-- [ ] Tests `tests/test_api.py`
-  - [ ] Test alle Endpoints mit Stubs/Mocks
+- [x] Tests `tests/test_api.py`
+  - [x] Test alle Endpoints mit Stubs/Mocks
 
-**Status:** ⬜ Nicht gestartet  
-**Notizen:** —
+**Status:** ✅ Abgeschlossen  
+**Notizen:** Implementiert, getestet und mit `pytest tests/test_api.py` verifiziert.
 
 ---
 
 ### 2.2 CSV-Export
 **Beschreibung:** Export in `norm_data_powerquery.csv` für Excel Power Query.
 
-- [ ] Modul `src/normen_tool/export.py`
-  - [ ] Funktion `export_to_csv(project_dir, blocks)` — CSV schreiben
-  - [ ] Spalten: `ID`, `doc_name`, `section`, `content`, `DeepLink_Editor`
-  - [ ] DeepLink generieren: `http://localhost:8000/ui?doc={doc_id}&block={block_id}`
+- [x] Modul `src/normen_tool/export.py`
+  - [x] Funktion `export_to_csv(project_dir, blocks)` — CSV schreiben
+  - [x] Spalten: `ID`, `doc_name`, `section`, `content`, `DeepLink_Editor`
+  - [x] DeepLink generieren: `http://localhost:8000/ui?doc={doc_id}&block={block_id}`
   
-- [ ] Endpoint `GET /export/csv` — CSV downaden oder im Ordner speichern
-- [ ] Tests `tests/test_export.py`
+- [x] Endpoint `GET /export/csv` — CSV downloaden oder im Ordner speichern
+- [x] Tests `tests/test_api.py` (API-Export-Abdeckung)
 
-**Status:** ⬜ Nicht gestartet  
-**Notizen:** —
+**Status:** ✅ Abgeschlossen  
+**Notizen:** CSV-Export implementiert, API-Endpunkt verfügbar und mit `pytest tests/test_api.py` verifiziert.
 
 ---
 
 ## 📅 Phase 3: Web-UI (Woche 3–4)
 
+### 3.0 MVP: Lauffähige Version
+**Beschreibung:** Priorisiere einen minimalen, lauffähigen Workflow; weitere UI-Funktionen folgen später.
+
+- [x] `uvicorn normen_tool.main:app --reload` starten
+- [x] `GET /` serviert die Startseite
+- [x] `POST /project/open` öffnet das Projekt und lädt/erstellt die DB
+- [x] `GET /project/status` im UI auswerten und anzeigen
+- [x] `GET /project/pdfs` listet PDFs im Projektordner
+- [x] Projektpfad-Eingabe/Ordner-Auswahl stabilisieren
+- [x] `GET /pdf/{doc_id}/download` liefert PDF-Dateien
+- [x] PDF-Seite mit Seiteingabe auswählen und rendern
+- [x] PDF.js-Grund-Rendering im Browser
+- [x] `GET /blocks/{doc_id}` liefert Blöcke für die ausgewählte PDF
+- [x] `GET /block/{id}` liefert Block-Details
+- [x] `PATCH /block/{id}` speichert einfache Block-Änderungen
+- [x] Block-Liste nach Blockspeicherung automatisch aktualisieren
+- [x] `GET /export/csv` liefert den CSV-Export
+- [x] klares Feedback im UI: Ladezustand, Erfolg, Fehler
+- [x] `pytest -q` läuft erfolgreich
+- [x] manuelle MVP-Abnahme: Projekt öffnen, PDF rendern, Block bearbeiten, CSV exportieren
+
+**Status:** ✅ MVP erreicht  
+**Notizen:** Das MVP ist lauffähig: Projekt öffnen, PDFs anzeigen/rendern, Blöcke laden/speichern und CSV exportieren funktionieren. UI-Politur, Deep-Linking und visuelles Highlighting bleiben für Phase 3.2.
+
+---
+
 ### 3.1 Frontend-Gerüst
 **Beschreibung:** HTML5 + PDF.js Viewer, Split-Screen Layout, Block-Editor.
 
-- [ ] Ordner `src/normen_tool/static/` erstellen
-  - [ ] `index.html` — Haupt-UI
-  - [ ] `styles.css` — Split-Screen Layout (50/50)
-  - [ ] `app.js` — Projekt-Auswahl, PDF-Auswahl
+- [x] Ordner `src/normen_tool/static/` erstellen
+  - [x] `index.html` — Haupt-UI
+  - [x] `styles.css` — Split-Screen Layout (50/50)
+  - [x] `app.js` — Projekt-Auswahl, PDF-Auswahl
 
-- [ ] **Komponenten**
-  - [ ] Ordner-Picker (Button → `<input type="file" webkitdirectory>`)
-  - [ ] PDF-Dropdown
-  - [ ] PDF-Viewer (Links) — PDF.js Canvas
-  - [ ] Block-Editor (Rechts) — Textarea + Metadaten
+- [x] **Komponenten**
+  - [x] Ordner-Picker (Button → `<input type="file" webkitdirectory>`)
+  - [x] PDF-Dropdown
+  - [x] PDF-Viewer (Links) — PDF.js Canvas
+  - [x] Block-Editor (Rechts) — Textarea + Metadaten
   
-- [ ] Endpoint `GET /` — `index.html` servieren
+- [x] Endpoint `GET /` — `index.html` servieren
 
-**Status:** ⬜ Nicht gestartet  
-**Notizen:** —
+**Status:** ✅ Abgeschlossen  
+**Notizen:** Frontend-Grundgerüst ist umgesetzt: statische Assets, Ordner-Picker, PDF-Auswahl, Metadatenanzeige, PDF.js-Seitenrendering und Block-Editor mit Block-Auswahl, Abschnittsfeld und Speichern. Deep-Linking folgt in Phase 3.2.
 
 ---
 

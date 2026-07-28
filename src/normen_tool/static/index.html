@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Normen-Segmentierungs-Tool</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="panel">
+          <h1>Normen-Tool</h1>
+          <label for="projectFolderInput">Projektordner wählen</label>
+          <input id="projectFolderInput" type="file" webkitdirectory directory multiple />
+          <button id="openProjectButton">Projekt öffnen</button>
+          <input id="projectPathInput" type="text" placeholder="Projektordner-Pfad" />
+          <button id="refreshStatusButton" type="button">Projektstatus laden</button>
+          <button id="loadPdfListButton">PDF-Liste laden</button>
+          <div class="status-box">
+            <h3>Status</h3>
+            <pre id="statusOutput">Kein Projekt geöffnet.</pre>
+          </div>
+          <div class="message-box" id="messageOutput">Bereit.</div>
+        </div>
+
+        <div class="panel">
+          <h2>PDFs</h2>
+          <select id="pdfList" size="8"></select>
+          <input id="pageNumberInput" type="number" min="1" value="1" placeholder="Seitenzahl" />
+          <button id="downloadPdfButton">PDF herunterladen</button>
+          <button id="renderPageButton">Seite rendern</button>
+        </div>
+      </aside>
+
+      <main class="main-content">
+        <section class="card">
+          <h2>PDF-Metadaten</h2>
+          <pre id="metadataOutput">Keine PDF geladen.</pre>
+        </section>
+
+        <section class="card">
+          <h2>PDF-Vorschau</h2>
+          <div id="pdfPreview">
+            <canvas id="pdfCanvas"></canvas>
+          </div>
+        </section>
+
+        <section class="card">
+          <h2>Block-Editor</h2>
+          <div class="field-group">
+            <label for="blockList">Block auswählen</label>
+            <select id="blockList" size="6"></select>
+            <div class="button-row">
+              <button id="loadBlockButton" type="button">Block laden</button>
+              <button id="refreshBlocksButton" type="button">Liste aktualisieren</button>
+            </div>
+          </div>
+          <div class="field-group">
+            <label for="blockSectionInput">Abschnitt / Section</label>
+            <input id="blockSectionInput" type="text" placeholder="Abschnitt/Section" />
+          </div>
+          <div class="field-group">
+            <label for="blockContentTextarea">Block-Inhalt</label>
+            <textarea id="blockContentTextarea" rows="10" placeholder="Block-Inhalt"></textarea>
+          </div>
+          <div class="button-row">
+            <button id="saveBlockButton" type="button">Block speichern</button>
+          </div>
+        </section>
+      </main>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.10.725/pdf.min.js"></script>
+    <script src="/static/app.js"></script>
+  </body>
+</html>

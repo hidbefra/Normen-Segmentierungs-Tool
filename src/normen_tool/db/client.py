@@ -326,6 +326,29 @@ class DBClient:
         finally:
             session.close()
 
+    def delete_blocks_for_document(self, document_id: str) -> int:
+        """
+        Delete all blocks associated with a document.
+
+        Args:
+            document_id: Document ID.
+
+        Returns:
+            Number of blocks deleted.
+        """
+        session = self._get_session()
+        try:
+            deleted = session.query(Block).filter(Block.document_id == document_id).delete()
+            session.commit()
+            logger.info(f"Deleted {deleted} blocks for document: {document_id[:8]}...")
+            return deleted
+        except Exception as e:
+            session.rollback()
+            logger.error(f"Error deleting blocks for document: {e}")
+            raise
+        finally:
+            session.close()
+
     # ========== Batch Operations ==========
 
     def bulk_insert_blocks(
