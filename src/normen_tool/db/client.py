@@ -188,6 +188,7 @@ class DBClient:
         block_type: str = "paragraph",
         pages: Optional[List[int]] = None,
         bboxes: Optional[List[tuple]] = None,
+        page_rotations: Optional[List[int]] = None,
         ai_generated: bool = False,
     ) -> Block:
         """
@@ -209,6 +210,8 @@ class DBClient:
             pages = [0]
         if bboxes is None:
             bboxes = [(0, 0, 100, 100)]
+        if page_rotations is None:
+            page_rotations = []
 
         session = self._get_session()
         block_id = None
@@ -220,6 +223,7 @@ class DBClient:
                 block_type=block_type,
                 pages=pages,
                 bboxes=bboxes,
+                page_rotations=page_rotations,
                 ai_generated=ai_generated,
             )
             session.add(block)
@@ -386,7 +390,7 @@ class DBClient:
             block_data_list = [
                 {"id": b.id, "content": b.content, "section": b.section, 
                  "document_id": b.document_id, "block_type": b.block_type, 
-                 "pages": b.pages, "bboxes": b.bboxes, "ai_generated": b.ai_generated,
+                 "pages": b.pages, "bboxes": b.bboxes, "page_rotations": b.page_rotations, "ai_generated": b.ai_generated,
                  "created_at": b.created_at, "modified_at": b.modified_at}
                 for b in blocks
             ]

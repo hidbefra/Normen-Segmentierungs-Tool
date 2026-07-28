@@ -173,11 +173,11 @@ class RuleBasedSegmenter:
         merged = []
         current_text = ""
         current_page_start = blocks[0].page_num
-        current_bbox_start = blocks[0].bbox
-        current_bbox_end = None
+        current_page_bboxes: Dict[int, List[Tuple[float, float, float, float]]] = {}
 
         for i, block in enumerate(blocks):
             current_text += (" " if current_text else "") + block.text
+            current_page_bboxes.setdefault(block.page_num, []).append(block.bbox)
 
             # Check if we should merge with next block
             if i < len(blocks) - 1:
@@ -190,38 +190,55 @@ class RuleBasedSegmenter:
                         logger.debug(
                             f"Cross-page merge: page {block.page_num} -> {next_block.page_num}"
                         )
-                    current_bbox_end = next_block.bbox
                     continue
 
             # Finalize current merged block
+            page_start = current_page_start
+            page_end = block.page_num
             merged_block = {
                 "text": current_text.strip(),
-                "page_start": current_page_start,
-                "page_end": block.page_num,
-                "bbox_start": current_bbox_start,
-                "bbox_end": current_bbox_end or block.bbox,
+                "page_start": page_start,
+                "page_end": page_end,
+                "bbox_start": self._merge_bboxes(current_page_bboxes.get(page_start, [])),
+                "bbox_end": self._merge_bboxes(current_page_bboxes.get(page_end, [])),
             }
             merged.append(merged_block)
 
             # Reset for next block
             current_text = ""
             current_page_start = blocks[i + 1].page_num if i + 1 < len(blocks) else block.page_num
-            current_bbox_start = blocks[i + 1].bbox if i + 1 < len(blocks) else block.bbox
-            current_bbox_end = None
+            current_page_bboxes = {}
 
         # Handle remaining text
         if current_text.strip():
+            page_start = current_page_start
+            page_end = blocks[-1].page_num
             merged_block = {
                 "text": current_text.strip(),
-                "page_start": current_page_start,
-                "page_end": blocks[-1].page_num,
-                "bbox_start": current_bbox_start,
-                "bbox_end": blocks[-1].bbox,
+                "page_start": page_start,
+                "page_end": page_end,
+                "bbox_start": self._merge_bboxes(current_page_bboxes.get(page_start, [])),
+                "bbox_end": self._merge_bboxes(current_page_bboxes.get(page_end, [])),
             }
             merged.append(merged_block)
 
         logger.debug(f"Merged {len(blocks)} blocks into {len(merged)}")
         return merged
+
+    def _merge_bboxes(
+        self,
+        bboxes: List[Tuple[float, float, float, float]],
+    ) -> Optional[Tuple[float, float, float, float]]:
+        """Return a single bbox spanning all supplied bboxes."""
+        if not bboxes:
+            return None
+
+        return (
+            min(bbox[0] for bbox in bboxes),
+            min(bbox[1] for bbox in bboxes),
+            max(bbox[2] for bbox in bboxes),
+            max(bbox[3] for bbox in bboxes),
+        )
 
     def _trim_sentence_boundaries(self, text: str) -> str:
         """

@@ -3,6 +3,8 @@ PDF-Handler: Handling native & scanned PDFs, OCR Layer detection, Text & BBox ex
 """
 
 import logging
+import os
+import time
 from pathlib import Path
 from typing import Optional, List, Dict, Tuple, Any
 
@@ -96,6 +98,23 @@ class PDFHandler:
             "rotation": page.rotation,
         }
 
+    def _get_corrected_page(self, page_num: int) -> Tuple[fitz.Page, Dict[str, Any]]:
+        """Return a page that has been rotated to a normalized orientation for processing."""
+        if page_num < 0 or page_num >= self.page_count:
+            raise IndexError(f"Page {page_num} out of range (0-{self.page_count - 1})")
+
+        page = self.doc[page_num]
+        current_rotation = int(page.rotation or 0)
+        target_rotation = (360 - current_rotation) % 360
+
+        if target_rotation:
+            page.set_rotation(target_rotation)
+
+        return page, {
+            "original_rotation": current_rotation,
+            "processing_rotation": 0,
+        }
+
     def extract_text_and_bboxes(self, page_num: int) -> List[Dict[str, Any]]:
         """
         Extract text blocks and their bounding boxes from a page.
@@ -114,7 +133,7 @@ class PDFHandler:
         if page_num < 0 or page_num >= self.page_count:
             raise IndexError(f"Page {page_num} out of range (0-{self.page_count - 1})")
 
-        page = self.doc[page_num]
+        page, _ = self._get_corrected_page(page_num)
         blocks = []
 
         try:
@@ -247,3 +266,43 @@ def get_pdf_page_count(pdf_path: str | Path) -> int:
     """Get total page count of a PDF."""
     with PDFHandler(pdf_path) as handler:
         return handler.page_count
+
+
+def correct_pdf_page_rotations(pdf_path: str | Path) -> Path:
+    """Normalize page rotations in a PDF and overwrite the original file.
+
+    The function opens the PDF, resets each page to rotation 0, and writes the
+    updated document back to the same path. This is useful for PDFs whose page
+    rotation metadata is set incorrectly and should be corrected in place.
+    """
+    pdf_path = Path(pdf_path)
+    if not pdf_path.exists():
+        raise FileNotFoundError(f"PDF not found: {pdf_path}")
+
+    temp_path = pdf_path.with_suffix(pdf_path.suffix + ".tmp")
+
+    with PDFHandler(pdf_path) as handler:
+        for page_num in range(handler.page_count):
+            page = handler.doc[page_num]
+            page.set_rotation(0)
+
+        handler.doc.save(temp_path, garbage=4, deflate=True)
+
+    if temp_path.exists():
+        last_error = None
+        for attempt in range(3):
+            try:
+                temp_path.replace(pdf_path)
+                break
+            except PermissionError as exc:
+                last_error = exc
+                time.sleep(0.5)
+        else:
+            if pdf_path.exists():
+                try:
+                    pdf_path.unlink()
+                except PermissionError:
+                    raise last_error
+            temp_path.replace(pdf_path)
+
+    return pdf_path

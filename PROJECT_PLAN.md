@@ -172,18 +172,25 @@ Modulare webbasierte Anwendung zur Segmentierung, Korrektur und Export von Norme
 ### 3.2 Deep-Linking & Highlighting
 **Beschreibung:** Deep-Links + visuelle Hervorhebung von Blöcken im PDF.
 
-- [ ] Deep-Link-Parser in JS: `?doc={doc_id}&block={block_id}`
-  - [ ] PDF laden + auf Seite springen
-  - [ ] Block-Hervorhebung (Bounding Box)
+- [x] Deep-Link-Parser in JS: `?doc={doc_id}&block={block_id}`
+  - [x] PDF laden + auf Seite springen
+  - [x] Block-Hervorhebung (Bounding Box)
   
-- [ ] Bounding-Box-Highlighting
-  - [ ] Funktion `highlight_bbox(page, bbox, color)` — PDF.js Canvas overlay
-  - [ ] Farben: Fokus (Rot), Nachbar (Gelb)
+- [x] Bounding-Box-Highlighting
+  - [x] Funktion `drawBlockHighlights(...)` als Canvas-Overlay im Frontend
+  - [x] Farben: Fokus (Rot), Nachbar (Gelb/Orange)
 
-- [ ] Tests: Manuelle Überprüfung
+- [x] Tests: Regressionstest für die Deep-Link-Logik
 
-**Status:** ⬜ Nicht gestartet  
-**Notizen:** —
+**Status:** ✅ Teilweise umgesetzt  
+**Notizen:**
+- Die Grundfunktion für Deep-Links und einfache Block-Hervorhebung ist im Frontend umgesetzt.
+- Die aktuelle Variante arbeitet über den Server-Fallback für die Seitenvorschau, da das externe PDF.js-Skript im Browser von der Netzwerk-Policy blockiert wird.
+- Nächste Adresspunkte für die Weiterentwicklung:
+  - Vollständigere Unterstützung für mehrere Highlights pro Seite (Fokus + Nachbarn).
+  - Robustere Koordinaten-Transformation für PDF.js-Rendering, falls die Bounding-Boxen nicht exakt auf die gerenderte Seite passen.
+  - Erweiterung um echte Deep-Link-Targets für seitenübergreifende Blöcke und Nachbar-Kontext.
+  - Optional: Backend-Endpoint für annotierte Render-Ausgaben, falls die Canvas-Overlay-Logik später in den Server verlagert werden soll.
 
 ---
 

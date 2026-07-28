@@ -30,15 +30,12 @@
           <input id="pageNumberInput" type="number" min="1" value="1" placeholder="Seitenzahl" />
           <button id="downloadPdfButton">PDF herunterladen</button>
           <button id="renderPageButton">Seite rendern</button>
+          <button id="correctPdfRotationButton" type="button">PDF-Rotation korrigieren</button>
+          <button id="runRuleBasedSegmentationButton" type="button">Rule-based segmentieren</button>
         </div>
       </aside>
 
       <main class="main-content">
-        <section class="card">
-          <h2>PDF-Metadaten</h2>
-          <pre id="metadataOutput">Keine PDF geladen.</pre>
-        </section>
-
         <section class="card">
           <h2>PDF-Vorschau</h2>
           <div id="pdfPreview">
@@ -64,6 +61,50 @@
             <label for="blockContentTextarea">Block-Inhalt</label>
             <textarea id="blockContentTextarea" rows="10" placeholder="Block-Inhalt"></textarea>
           </div>
+          <div class="field-group">
+            <label>Box-Koordinaten (Segmentierung)</label>
+            <div class="coord-grid">
+              <label>
+                <span>Links (x0)</span>
+                <input id="boxLeftInput" type="text" readonly />
+              </label>
+              <label>
+                <span>Oben (y0)</span>
+                <input id="boxTopInput" type="text" readonly />
+              </label>
+              <label>
+                <span>Rechts (x1)</span>
+                <input id="boxRightInput" type="text" readonly />
+              </label>
+              <label>
+                <span>Unten (y1)</span>
+                <input id="boxBottomInput" type="text" readonly />
+              </label>
+            </div>
+            <div class="coord-grid">
+              <label>
+                <span>Gezeichnete Box links</span>
+                <input id="drawnBoxLeftInput" type="text" readonly />
+              </label>
+              <label>
+                <span>Gezeichnete Box oben</span>
+                <input id="drawnBoxTopInput" type="text" readonly />
+              </label>
+              <label>
+                <span>Gezeichnete Box Breite</span>
+                <input id="drawnBoxWidthInput" type="text" readonly />
+              </label>
+              <label>
+                <span>Gezeichnete Box Höhe</span>
+                <input id="drawnBoxHeightInput" type="text" readonly />
+              </label>
+            </div>
+            <div class="field-group">
+              <label for="drawAngleInput">Drehwinkel</label>
+              <input id="drawAngleInput" type="text" readonly />
+            </div>
+            <div id="blockChangeSummary" class="info-box">Bitte einen Block auswählen.</div>
+          </div>
           <div class="button-row">
             <button id="saveBlockButton" type="button">Block speichern</button>
           </div>
@@ -71,6 +112,7 @@
       </main>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.10.725/pdf.min.js"></script>
+    <script src="/static/coord_transform.js?v=20260728-2"></script>
     <script src="/static/app.js?v=20260728-2"></script>
   </body>
 </html>

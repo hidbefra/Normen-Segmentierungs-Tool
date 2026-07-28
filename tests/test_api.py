@@ -72,6 +72,15 @@ def test_get_pdf_pages_and_render_page(client, sample_project):
     assert response.content.startswith(b"\x89PNG")
 
 
+def test_correct_pdf_rotation_endpoint(client, sample_project):
+    client.post("/project/open", json={"project_dir": str(sample_project)})
+    doc_id = client.get("/project/pdfs").json()["pdfs"][0]["id"]
+
+    response = client.post(f"/pdf/{doc_id}/correct-rotation")
+    assert response.status_code == 200
+    assert "message" in response.json()
+
+
 def test_block_crud_and_parse_document(client, sample_project):
     client.post("/project/open", json={"project_dir": str(sample_project)})
     doc_id = client.get("/project/pdfs").json()["pdfs"][0]["id"]
@@ -115,6 +124,17 @@ def test_block_crud_and_parse_document(client, sample_project):
     )
     assert parse_response.status_code == 200
     assert parse_response.json()["blocks_created"] >= 1
+
+    list_blocks_response = client.get(f"/blocks/{doc_id}")
+    assert list_blocks_response.status_code == 200
+    blocks = list_blocks_response.json()["blocks"]
+    assert blocks
+    assert any(
+        block["content"] != "Manueller Absatz"
+        and block["pages"]
+        and block["pages"][0] >= 1
+        for block in blocks
+    )
 
     # Delete the created block
     delete_response = client.delete(f"/block/{block_id}")

@@ -25,6 +25,7 @@ def block_to_block_data(block: Block) -> BlockData:
         block_type=block.block_type,
         pages=list(block.pages or []),
         bboxes=[list(item) for item in (block.bboxes or [])],
+        page_rotations=list(getattr(block, "page_rotations", []) or []),
         ai_generated=block.ai_generated,
         created_at=block.created_at,
         modified_at=block.modified_at,

@@ -1,3 +1,4 @@
+from pathlib import Path
 from fastapi import APIRouter, Depends, HTTPException, Response, Query
 from fastapi.responses import FileResponse
 from typing import Optional, List
@@ -9,7 +10,7 @@ from normen_tool.api.schemas import (
     SegmentationRequest,
     SegmentationResponse,
 )
-from normen_tool.pdf_handler import PDFHandler
+from normen_tool.pdf_handler import PDFHandler, correct_pdf_page_rotations
 from normen_tool.segmentation import segment_pdf_blocks
 
 router = APIRouter(tags=["pdf"])
@@ -73,6 +74,29 @@ def download_pdf_document(doc_id: str, context=Depends(get_project_context)):
     return FileResponse(path=document.path, filename=document.name, media_type="application/pdf")
 
 
+@router.post("/pdf/{doc_id}/correct-rotation")
+def correct_pdf_rotation(doc_id: str, context=Depends(get_project_context)):
+    document = context.db_client.get_document(doc_id)
+    if document is None:
+        raise HTTPException(status_code=404, detail="Document not found.")
+
+    if not document.path or not Path(document.path).exists():
+        raise HTTPException(status_code=404, detail="PDF file not found on disk.")
+
+    try:
+        corrected_path = correct_pdf_page_rotations(document.path)
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+    if corrected_path != Path(document.path):
+        raise HTTPException(status_code=500, detail="PDF could not be overwritten.")
+
+    return {
+        "doc_id": doc_id,
+        "message": "PDF rotation corrected and saved.",
+    }
+
+
 @router.post("/pdf/{doc_id}/parse", response_model=SegmentationResponse)
 def parse_pdf_document(
     doc_id: str,
@@ -85,7 +109,10 @@ def parse_pdf_document(
 
     with PDFHandler(document.path) as handler:
         all_blocks = []
+        page_rotations = []
         for page_num in range(handler.page_count):
+            page_info = handler.get_page_metadata(page_num)
+            page_rotations.append(int(page_info.get("rotation", 0) or 0))
             page_blocks = handler.extract_text_and_bboxes(page_num)
             all_blocks.extend(
                 (block["text"], tuple(block["bbox"]), page_num)
@@ -100,12 +127,21 @@ def parse_pdf_document(
 
     block_records = []
     for segment in segmented_blocks:
-        pages = [segment.page_start] if segment.page_start == segment.page_end else [segment.page_start, segment.page_end]
-        bboxes = [
-            list(segment.bbox_start) if segment.bbox_start else [],
-        ]
-        if segment.bbox_end and segment.page_end != segment.page_start:
+        page_start = segment.page_start + 1
+        page_end = segment.page_end + 1
+        pages = [page_start] if page_start == page_end else [page_start, page_end]
+
+        bboxes = []
+        if segment.bbox_start is not None:
+            bboxes.append(list(segment.bbox_start))
+        if segment.bbox_end is not None and page_start != page_end:
             bboxes.append(list(segment.bbox_end))
+
+        rotations_for_segment = []
+        for page_num in pages:
+            page_index = page_num - 1
+            if 0 <= page_index < len(page_rotations):
+                rotations_for_segment.append(page_rotations[page_index])
 
         block_records.append(
             {
@@ -114,6 +150,7 @@ def parse_pdf_document(
                 "block_type": segment.segment_type,
                 "pages": pages,
                 "bboxes": bboxes,
+                "page_rotations": rotations_for_segment,
                 "ai_generated": False,
             }
         )

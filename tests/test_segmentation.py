@@ -168,6 +168,18 @@ class TestRuleBasedSegmenter:
         # Should be separate
         assert len(merged) == 2
 
+    def test_merged_bbox_spans_all_blocks_in_segment(self, segmenter):
+        """Test that merged segments use a union bbox covering all included blocks."""
+        blocks = [
+            Block("First line of a longer paragraph", (10, 20, 80, 40), 0),
+            Block("Second line of the same paragraph", (10, 45, 90, 70), 0),
+        ]
+        merged = segmenter._merge_cross_page_blocks(blocks)
+
+        assert len(merged) == 1
+        assert merged[0]["bbox_start"] == (10, 20, 90, 70)
+        assert merged[0]["bbox_end"] == (10, 20, 90, 70)
+
     def test_sentence_boundary_trimming(self, segmenter):
         """Test trimming of sentence boundaries."""
         # Text with punctuation at end

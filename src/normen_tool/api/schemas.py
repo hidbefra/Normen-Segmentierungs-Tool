@@ -91,6 +91,7 @@ class BlockData(BaseModel):
     block_type: str  # "chapter", "section", "paragraph"
     pages: List[int]
     bboxes: List[List[float]]  # List of (x, y, w, h) tuples
+    page_rotations: List[int] = Field(default_factory=list, description="Rotation per page in degrees")
     ai_generated: bool
     created_at: datetime
     modified_at: datetime
@@ -119,6 +120,7 @@ class BlockCreateRequest(BaseModel):
     block_type: str = "paragraph"
     pages: List[int] = Field(..., description="Page numbers")
     bboxes: List[List[float]] = Field(..., description="Bounding boxes")
+    page_rotations: List[int] = Field(default_factory=list, description="Rotation per page in degrees")
     ai_generated: bool = False
 
 

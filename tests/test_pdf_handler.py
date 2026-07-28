@@ -14,6 +14,7 @@ from normen_tool.pdf_handler import (
     load_pdf,
     extract_text_and_bboxes_from_pdf,
     get_pdf_page_count,
+    correct_pdf_page_rotations,
 )
 
 
@@ -130,6 +131,23 @@ class TestPDFHandler:
 
         handler.close()
 
+    def test_extract_text_and_bboxes_rotated_page(self, tmp_path):
+        """Test extracting blocks from a page rotated to 90 degrees."""
+        pdf_path = tmp_path / "rotated.pdf"
+        doc = fitz.open()
+        page = doc.new_page()
+        page.insert_text((50, 50), "Rotated PDF Content", fontsize=12)
+        page.set_rotation(90)
+        doc.save(pdf_path)
+        doc.close()
+
+        handler = PDFHandler(pdf_path)
+        blocks = handler.extract_text_and_bboxes(0)
+
+        assert len(blocks) > 0
+        assert any("Rotated PDF Content" in block["text"] for block in blocks)
+        handler.close()
+
     def test_extract_full_text(self, sample_pdf_path):
         """Test extracting full page text."""
         handler = PDFHandler(sample_pdf_path)
@@ -196,6 +214,22 @@ class TestTopLevelFunctions:
         """Test get_pdf_page_count() function."""
         count = get_pdf_page_count(sample_pdf_path)
         assert count == 1
+
+    def test_correct_pdf_page_rotations_overwrites_pdf(self, tmp_path):
+        """Test correcting page rotations and overwriting the original PDF."""
+        pdf_path = tmp_path / "rotated_overwrite.pdf"
+        doc = fitz.open()
+        page = doc.new_page()
+        page.insert_text((50, 50), "Rotation test", fontsize=12)
+        page.set_rotation(90)
+        doc.save(pdf_path)
+        doc.close()
+
+        corrected_path = correct_pdf_page_rotations(pdf_path)
+
+        assert corrected_path == pdf_path
+        with fitz.open(pdf_path) as reopened:
+            assert reopened[0].rotation == 0
 
 
 class TestPDFHandlerMultiPage:

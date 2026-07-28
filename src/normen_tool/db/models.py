@@ -52,6 +52,7 @@ class Block(Base):
     block_type = Column(String(50), default="paragraph")  # 'chapter', 'section', 'paragraph'
     pages = Column(JSON, nullable=False)  # List[int], e.g., [2, 3]
     bboxes = Column(JSON, nullable=False)  # List of bboxes per page
+    page_rotations = Column(JSON, nullable=False, default=list)  # Rotation per page in degrees
     ai_generated = Column(Boolean, default=False)
     created_at = Column(DateTime, default=datetime.utcnow)
     modified_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
