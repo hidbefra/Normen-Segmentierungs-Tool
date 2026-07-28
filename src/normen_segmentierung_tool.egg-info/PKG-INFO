@@ -48,11 +48,19 @@ Dieses Repository enthält ein Python-Projekt für die segmentierte Verarbeitung
 
 ## Start
 
-Später kann der Server mit `uvicorn` gestartet werden:
+Der Server kann über ein kleines Desktop-GUI gestartet und gestoppt werden:
+
+```powershell
+normen-tool-gui
+```
+
+Alternativ kann der Server weiterhin direkt mit `uvicorn` gestartet werden:
 
 ```powershell
 uvicorn normen_tool.main:app --reload
 ```
+
+Die Logs landen standardmäßig in `logs/normen_tool.log`.
 
 ## Tests
 

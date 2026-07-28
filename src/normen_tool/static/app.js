@@ -1,5 +1,8 @@
-pdfjsLib.GlobalWorkerOptions.workerSrc =
-  "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.10.725/pdf.worker.min.js";
+const pdfJsAvailable = typeof window.pdfjsLib !== "undefined";
+if (pdfJsAvailable) {
+  window.pdfjsLib.GlobalWorkerOptions.workerSrc =
+    "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.10.725/pdf.worker.min.js";
+}
 
 const projectFolderInput = document.getElementById("projectFolderInput");
 const projectPathInput = document.getElementById("projectPathInput");
@@ -27,6 +30,43 @@ let currentDocName = null;
 let currentPageCount = 0;
 let currentPdfUrl = null;
 let currentBlockId = null;
+
+function setProjectControlsEnabled(enabled) {
+  [
+    loadPdfListButton,
+    pdfList,
+    downloadPdfButton,
+    renderPageButton,
+    pageNumberInput,
+    blockList,
+    loadBlockButton,
+    refreshBlocksButton,
+    blockSectionInput,
+    blockContentTextarea,
+    saveBlockButton,
+  ].forEach((element) => {
+    if (element) {
+      element.disabled = !enabled;
+    }
+  });
+}
+
+function resetProjectState() {
+  currentDocId = null;
+  currentDocName = null;
+  currentPageCount = 0;
+  currentPdfUrl = null;
+  currentBlockId = null;
+  pageNumberInput.max = 1;
+  pageNumberInput.value = 1;
+  metadataOutput.textContent = "Keine PDF geladen.";
+  pdfCanvas.width = 0;
+  pdfCanvas.height = 0;
+  pdfList.innerHTML = "";
+  blockList.innerHTML = "";
+  blockSectionInput.value = "";
+  blockContentTextarea.value = "";
+}
 
 async function sendJson(path, method = "GET", body = null) {
   const response = await fetch(path, {
@@ -57,12 +97,14 @@ async function openProject() {
   if (!response.ok) {
     const error = await response.text();
     showMessage(`Fehler: ${error}`, "error");
+    setProjectControlsEnabled(false);
     return;
   }
 
   showMessage("Projekt geöffnet.", "success");
   await loadProjectStatus();
   await loadPdfList();
+  setProjectControlsEnabled(true);
 }
 
 async function loadProjectStatus() {
@@ -127,11 +169,27 @@ async function handleFolderSelection(event) {
     const fullPath = firstFile.path;
     const folderPath = fullPath.replace(/\\[^\\]*$/, "");
     projectPathInput.value = folderPath;
-    showMessage("Projektpfad automatisch eingetragen.", "info");
+    showMessage("Projektpfad automatisch eingetragen. Projekt wird geöffnet...", "info");
+    await openProject();
   } else if (firstFile.webkitRelativePath) {
-    const rootFolder = firstFile.webkitRelativePath.split("/")[0];
-    projectPathInput.value = rootFolder;
-    showMessage("Projektpfad automatisch eingetragen.", "info");
+    const relativeFolder = firstFile.webkitRelativePath.split("/")[0];
+    projectPathInput.value = relativeFolder;
+    const manualPath = window.prompt(
+      "Der Browser kann den absoluten Projektpfad nicht automatisch lesen. Bitte den vollständigen Projektordner-Pfad eingeben:",
+      projectPathInput.value
+    );
+
+    if (!manualPath || !manualPath.trim()) {
+      showMessage(
+        "Der absolute Projektpfad konnte nicht automatisch ermittelt werden. Bitte den vollständigen Pfad im Textfeld eintragen und dann 'Projekt öffnen' klicken.",
+        "error"
+      );
+      return;
+    }
+
+    projectPathInput.value = manualPath.trim();
+    showMessage("Projektpfad eingetragen. Projekt wird geöffnet...", "info");
+    await openProject();
   } else {
     showMessage("Bitte den Projektordner-Pfad manuell eingeben.", "error");
   }
@@ -208,6 +266,32 @@ async function downloadPdf() {
   window.location.href = `/pdf/${currentDocId}/download`;
 }
 
+async function renderPdfPageViaBackend(pageNumber) {
+  const response = await fetch(`/pdf/${currentDocId}/rendered/${pageNumber}?format=png&dpi=150`);
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status}`);
+  }
+
+  const imageBlob = await response.blob();
+  const objectUrl = URL.createObjectURL(imageBlob);
+  try {
+    const image = await new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = () => reject(new Error("Bilddaten konnten nicht geladen werden."));
+      img.src = objectUrl;
+    });
+
+    pdfCanvas.width = image.width;
+    pdfCanvas.height = image.height;
+    const context = pdfCanvas.getContext("2d");
+    context.clearRect(0, 0, pdfCanvas.width, pdfCanvas.height);
+    context.drawImage(image, 0, 0);
+  } finally {
+    URL.revokeObjectURL(objectUrl);
+  }
+}
+
 async function renderPdfPage() {
   if (!currentDocId) {
     showMessage("Bitte zuerst eine PDF auswählen.", "error");
@@ -220,9 +304,22 @@ async function renderPdfPage() {
     return;
   }
 
+  showMessage("Seite wird gerendert...", "info");
+
+  if (!pdfJsAvailable) {
+    try {
+      await renderPdfPageViaBackend(pageNumber);
+      showMessage("Seite erfolgreich gerendert (Server-Fallback).", "success");
+    } catch (error) {
+      console.error(error);
+      showMessage(`Konnte PDF-Seite nicht rendern: ${error.message}`, "error");
+    }
+    return;
+  }
+
   const pdfUrl = `/pdf/${currentDocId}/download`;
   try {
-    const loadingTask = pdfjsLib.getDocument(pdfUrl);
+    const loadingTask = window.pdfjsLib.getDocument(pdfUrl);
     const pdf = await loadingTask.promise;
     const page = await pdf.getPage(pageNumber);
     const viewport = page.getViewport({ scale: 1.5 });
@@ -237,9 +334,16 @@ async function renderPdfPage() {
     };
 
     await page.render(renderContext).promise;
+    showMessage("Seite erfolgreich mit PDF.js gerendert.", "success");
   } catch (error) {
     console.error(error);
-    showMessage(`Konnte PDF-Seite nicht rendern: ${error.message}`, "error");
+    try {
+      await renderPdfPageViaBackend(pageNumber);
+      showMessage("PDF.js fehlgeschlagen, Server-Fallback erfolgreich.", "success");
+    } catch (fallbackError) {
+      console.error(fallbackError);
+      showMessage(`Konnte PDF-Seite nicht rendern: ${fallbackError.message}`, "error");
+    }
   }
 }
 
@@ -268,3 +372,6 @@ loadBlockButton.addEventListener("click", async () => {
 });
 refreshBlocksButton.addEventListener("click", loadBlockList);
 saveBlockButton.addEventListener("click", saveBlock);
+
+setProjectControlsEnabled(false);
+resetProjectState();

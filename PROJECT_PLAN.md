@@ -187,6 +187,40 @@ Modulare webbasierte Anwendung zur Segmentierung, Korrektur und Export von Norme
 
 ---
 
+### 3.3 Server-GUI & Logging
+**Beschreibung:** Kleines Desktop-GUI zum Starten/Stoppen des Servers und zentrales Logging in eine gemeinsame Log-Datei.
+
+**Empfohlene Reihenfolge:**
+1. **Logging-Grundlage schaffen**
+  - Gemeinsame Log-Datei im Projektordner oder in `logs/` definieren
+  - Standard-Log-Level festlegen: `INFO`
+  - Zusätzliche Stufen für Diagnose und Betrieb vorsehen: `DEBUG`, `WARNING`, `ERROR`, `CRITICAL`
+  - Log-Rotation oder eine vergleichbare Begrenzung festlegen
+2. **Logging in Kernkomponenten verdrahten**
+  - Server-Start und Server-Stopp protokollieren
+  - PDF-Laden und Verarbeitung protokollieren
+  - DB-Zugriffe und Exporte protokollieren
+  - GUI-Aktionen und Fehler protokollieren
+3. **Serversteuerung fachlich kapseln**
+  - Start- und Stopp-Mechanismus vom Web-Server so kapseln, dass er von einer GUI aufgerufen werden kann
+  - Statusabfrage für laufend, gestoppt und Fehlerzustand bereitstellen
+4. **Kleines Desktop-GUI umsetzen**
+  - Server starten
+  - Server stoppen
+  - Laufstatus anzeigen
+  - Log-Level optional über das GUI auswählbar machen
+5. **Integration und manuelle Abnahme**
+  - Prüfen, dass GUI, Server und Logging zusammen funktionieren
+  - Sicherstellen, dass keine sensiblen Inhalte im Klartext geloggt werden
+
+**Akzeptanzkriterien:**
+- Der Server lässt sich ohne Terminal über ein kleines GUI starten und stoppen.
+- Alle wesentlichen Vorgänge laufen in einer zentralen Log-Datei zusammen.
+- Die Log-Granularität kann über das Log-Level gesteuert werden.
+- Der Standardbetrieb verwendet `INFO`, für Fehlersuche steht `DEBUG` zur Verfügung.
+
+---
+
 ## 📅 Phase 4: KI/LLM-Integration (Optional, Später)
 
 ### 4.1 LLM-Config & API-Bridging

@@ -1,6 +1,3 @@
-import tempfile
-from pathlib import Path
-
 import fitz
 import pytest
 from fastapi.testclient import TestClient
@@ -46,6 +43,18 @@ def test_open_project_and_list_pdfs(client, sample_project):
     assert response.json()["pdfs"][0]["name"] == "sample.pdf"
 
 
+def test_open_project_with_duplicate_segment_path_is_corrected(client, sample_project):
+    duplicate_path = (
+        sample_project.parent / sample_project.parent.name / sample_project.name
+    )
+
+    response = client.post("/project/open", json={"project_dir": str(duplicate_path)})
+    assert response.status_code == 200
+
+    body = response.json()
+    assert body["project_dir"] == str(sample_project.resolve())
+
+
 def test_get_pdf_pages_and_render_page(client, sample_project):
     client.post("/project/open", json={"project_dir": str(sample_project)})
     response = client.get("/project/pdfs")
@@ -89,7 +98,9 @@ def test_block_crud_and_parse_document(client, sample_project):
     assert get_response.json()["block"]["content"] == "Manueller Absatz"
 
     # Update block
-    update_response = client.patch(f"/block/{block_id}", json={"content": "Aktualisierter Inhalt"})
+    update_response = client.patch(
+        f"/block/{block_id}", json={"content": "Aktualisierter Inhalt"}
+    )
     assert update_response.status_code == 200
     assert update_response.json()["block"]["content"] == "Aktualisierter Inhalt"
 
@@ -99,7 +110,9 @@ def test_block_crud_and_parse_document(client, sample_project):
     assert list_response.json()["count"] >= 1
 
     # Parse the document and create parsed blocks without removing existing blocks
-    parse_response = client.post(f"/pdf/{doc_id}/parse", json={"overwrite_existing": False})
+    parse_response = client.post(
+        f"/pdf/{doc_id}/parse", json={"overwrite_existing": False}
+    )
     assert parse_response.status_code == 200
     assert parse_response.json()["blocks_created"] >= 1
 

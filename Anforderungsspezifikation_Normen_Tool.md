@@ -98,6 +98,33 @@ Das System verarbeitet sowohl **native digitale PDFs** als auch **gescannte PDFs
   * **Multimodal / Vision:** Das LLM analysiert die gescannte Seite visuell und erkennt Absätze, Überschriften und Randbereiche unabhängig vom OCR-Layout.
   * **NLP-Strukturanalyse:** Das LLM korrigiert Erkennungsfehler der OCR-Ebene und teilt den Fließtext in zusammenhängende Kapitel und logische Absätze auf.
 
+### Phase 2.1: Server-Steuerung über kleines GUI
+
+* **Server Start / Stop über GUI:**
+  * Der Python-Server kann direkt über ein kleines Desktop-GUI gestartet und gestoppt werden.
+  * Das GUI soll möglichst einfach gehalten sein, zum Beispiel mit Qt oder einer ähnlichen kleinen nativen Oberfläche.
+* **Statusanzeige im GUI:**
+  * Das GUI zeigt an, ob der Server läuft, gestoppt wurde oder beim Start ein Fehler aufgetreten ist.
+* **Bedienung:**
+  * Start und Stop sollen ohne Terminal-Befehle möglich sein.
+  * Das GUI kann als separater Launcher oder als kleines Hilfsfenster neben der Web-Oberfläche bereitgestellt werden.
+
+### Phase 2.2: Logging & Diagnose
+
+* **Zentrales Logging:**
+  * Das gesamte Projekt schreibt Logs in eine gemeinsame Log-Datei.
+  * Alle relevanten Komponenten sollen über denselben Logging-Workflow protokollieren.
+* **Log-Datei:**
+  * Die Log-Datei wird im Projektordner oder in einem klar definierten Log-Verzeichnis abgelegt.
+  * Log-Rotation oder eine vergleichbare Begrenzung sollte vorgesehen werden, damit die Datei nicht unbegrenzt wächst.
+* **Log-Level / Granularität:**
+  * Die Log-Granularität soll über ein konfigurierbares Log-Level steuerbar sein.
+  * Geeignete Standard-Log-Levels sind: `DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL`.
+  * Empfohlene Voreinstellung ist `INFO` für den normalen Betrieb und `DEBUG` für die Fehlersuche.
+* **Anforderungen an Inhalte:**
+  * Start/Stop-Aktionen des Servers, Fehler beim Laden von PDFs, DB-Zugriffe, Exportvorgänge und relevante GUI-Aktionen sollen protokolliert werden.
+  * Sensible Inhalte wie API-Keys oder vertrauliche Nutzdaten dürfen nicht im Klartext geloggt werden.
+
 ---
 
 ### Phase 3: Seitenübergreifende Abschnitte (Cross-Page Handling)
@@ -178,6 +205,8 @@ Das System verarbeitet sowohl **native digitale PDFs** als auch **gescannte PDFs
 3. **Persistenz:** Vollständige Erhaltung aller manuellen und KI-generierten Korrekturen in der lokalen `project_database.db`.
 4. **Multiuser-Szenario:** Das System soll lokal arbeiten, aber Optionen für eine spätere Mehrbenutzer-Unterstützung über Netzlaufwerk oder SharePoint ermöglichen.
 5. **Aktuelle Datenbasis:** Es reicht eine aktuelle Datenbankdatei. Historisierung und Versionierung erfolgen über CSV-Exporte und eindeutige IDs.
+6. **Bedienbarkeit des Servers:** Start und Stopp des Servers sollen über ein kleines GUI ohne Terminal-Eingriff möglich sein.
+7. **Nachvollziehbarkeit:** Alle wesentlichen Vorgänge sollen zentral in einer Log-Datei protokolliert werden, mit konfigurierbarer Granularität über standardisierte Log-Levels.
 
 ### Mehrbenutzer-/Netzwerk-Optionen
 * **SQLite auf Netzlaufwerk / SharePoint:** Nicht empfehlenswert. SQLite ist nicht für gleichzeitige Zugriffe über Netzwerkdateien ausgelegt und kann zu Datenkorruption oder Sperrproblemen führen.

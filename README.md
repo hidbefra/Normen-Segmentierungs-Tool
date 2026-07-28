@@ -24,11 +24,39 @@ Dieses Repository enthält ein Python-Projekt für die segmentierte Verarbeitung
 
 ## Start
 
-Später kann der Server mit `uvicorn` gestartet werden:
+Der Server kann über ein kleines Desktop-GUI gestartet und gestoppt werden:
+
+```powershell
+normen-tool-gui
+```
+
+Alternativ kann der Launcher auch als Modul gestartet werden:
+
+```powershell
+python -m normen_tool.server_launcher
+```
+
+Direkter Dateistart ist ebenfalls möglich:
+
+```powershell
+python src/normen_tool/server_launcher.py
+```
+
+Alternativ kann der Server weiterhin direkt mit `uvicorn` gestartet werden:
 
 ```powershell
 uvicorn normen_tool.main:app --reload
 ```
+
+Die Logs landen standardmäßig in `logs/normen_tool.log`.
+
+### Troubleshooting Launcher
+
+- Wenn `normen-tool-gui` nicht gefunden wird, führe im Projekt aus:
+   - `python -m pip install -e .[dev]`
+- Wenn der Prozess mit Exit-Code `1` endet, starte den Launcher in der aktiven `.venv` und prüfe die Log-Datei unter `logs/normen_tool.log`.
+- Für einen schnellen Import-Check:
+   - `python -c "import tkinter, uvicorn; print('ok')"`
 
 ## Tests
 
